@@ -1,2 +1,2 @@
 # pnket
- for wfpm
+A simple download manager for wfpm
