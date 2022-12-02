@@ -17,18 +17,43 @@ fn main() {
     let opt = Opt::from_args();
     let url: &str = &opt.url;
     let output: &str = &opt.output;
-    if let Err(err) = download(url, output) {
-        println!("{:?}", err);
+    
+    if opt.text == true {
+        if let Err(err) = text(url) {
+            println!("{:?}", err);
+        }
+    } else {
+        if let Err(err) = download(url, output) {
+            println!("{:?}", err);
+        }
     }
 }
 
 #[tokio::main]
 async fn download(url: &str, output: &str) -> Result<()> {
     let filename = if output.is_empty() {url.split("/").last().unwrap()} else {output};
-    let response: reqwest::Response = reqwest::get(url).await?;
-    let bytes = response.bytes().await?;
+    let client = reqwest::Client::new();
+    let bytes = client.get(url)
+        .send()
+        .await?
+        .bytes()
+        .await?;
     let mut out = File::create(filename)?;
     io::copy(&mut bytes.as_ref(), &mut out)?;
+
+    Ok(())
+}
+
+#[tokio::main]
+async fn text(url: &str) -> Result<()> {
+    let client = reqwest::Client::new();
+    let content = client.get(url)
+        .send()
+        .await?
+        .text()
+        .await?;
+
+    println!("{}", content);
 
     Ok(())
 }
