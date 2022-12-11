@@ -11,6 +11,8 @@ struct Opt {
     output: String,
     #[structopt(short = "c", long)]
     text: bool,
+    #[structopt(short = "z", long)]
+    tzst: bool,
 }
 
 fn main() {
@@ -23,7 +25,7 @@ fn main() {
             println!("{:?}", err);
         }
     } else {
-        if let Err(err) = download::download(url, output) {
+        if let Err(err) = download::download(url, output, opt.tzst) {
             println!("{:?}", err);
         }
     }
