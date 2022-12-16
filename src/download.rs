@@ -23,23 +23,10 @@ pub async fn download(url: &str, output: &str, tzst_bool: bool, procs: usize) ->
     let bytes = get
         .bytes()
         .await?;
-
-    let file_size = bytes.len();
-    let chunk_size = file_size / procs;
-
+    
     let mut out = File::create(filename)?;
+    io::copy(&mut bytes.as_ref(), &mut out)?;
 
-    for i in 0..procs {
-        let start = i * chunk_size;
-        let end = if i == procs - 1 {
-            file_size
-        } else {
-            (i + 1) * chunk_size
-        };
-    
-        io::copy(&mut bytes[start..end].as_ref(), &mut out)?;
-    }
-    
     if tzst_bool {
         if rmext(filename) == filename {
             if let Err(err) = tzst::tzst(filename, &format!("{}{}", filename, ".d")) {
