@@ -5,7 +5,7 @@ use std::io;
 mod tzst;
 
 #[tokio::main]
-pub async fn download(url: &str, output: &str, tzst_bool: bool, procs: usize) -> Result<()> {
+pub async fn download(url: &str, output: &str, tzst_bool: bool) -> Result<()> {
     let filename: &str = if output.is_empty() {
         if url.ends_with("/") {
             &url[..url.rfind('/').unwrap()].split("/").last().unwrap()

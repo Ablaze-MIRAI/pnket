@@ -6,11 +6,9 @@ mod text;
 
 #[derive(StructOpt)]
 struct Opt {
-    url: String,
+    url: Vec<String>,
     #[structopt(short = "o", long, default_value = "")]
-    output: String,
-    #[structopt(short = "p", long, default_value = "1")]
-    procs: usize,
+    output: Vec<String>,
     #[structopt(short = "c", long)]
     text: bool,
     #[structopt(short = "z", long)]
@@ -19,21 +17,21 @@ struct Opt {
 
 fn main() {
     let opt = Opt::from_args();
-    let url: &str = &opt.url;
-    let output: &str = &opt.output;
-    let procs: usize = if opt.procs < 1 {
-            1
+    let url: Vec<&str> = opt.url.iter().map(|u| u.as_str()).collect();
+    let mut output: Vec<&str> = opt.output.iter().map(|o| o.as_str()).collect();
+    while output.len() < url.len() {
+        output.push("");
+    }
+
+    for i in 0..url.len() {
+        if opt.text == true {
+            if let Err(err) = text::text(url[i]) {
+                println!("{:?}", err);
+            }
         } else {
-            opt.procs
-        };
-    
-    if opt.text == true {
-        if let Err(err) = text::text(url) {
-            println!("{:?}", err);
-        }
-    } else {
-        if let Err(err) = download::download(url, output, opt.tzst, procs) {
-            println!("{:?}", err);
+            if let Err(err) = download::download(url[i], output[i], opt.tzst) {
+                println!("{:?}", err);
+            }
         }
     }
 }
