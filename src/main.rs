@@ -8,7 +8,7 @@ mod text;
 struct Opt {
     url: Vec<String>,
     #[structopt(short = "o", long, default_value = "")]
-    output: Vec<String>,
+    output: String,
     #[structopt(short = "c", long)]
     text: bool,
     #[structopt(short = "z", long)]
@@ -18,10 +18,7 @@ struct Opt {
 fn main() {
     let opt = Opt::from_args();
     let url: Vec<&str> = opt.url.iter().map(|u| u.as_str()).collect();
-    let mut output: Vec<&str> = opt.output.iter().map(|o| o.as_str()).collect();
-    while output.len() < url.len() {
-        output.push("");
-    }
+    let mut output: &str = &opt.output;
 
     for i in 0..url.len() {
         if opt.text == true {
@@ -29,9 +26,10 @@ fn main() {
                 println!("{:?}", err);
             }
         } else {
-            if let Err(err) = download::download(url[i], output[i], opt.tzst) {
+            if let Err(err) = download::download(url[i], output, opt.tzst) {
                 println!("{:?}", err);
             }
         }
+        output = "";
     }
 }

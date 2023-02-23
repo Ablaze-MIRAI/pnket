@@ -26,7 +26,7 @@ pub async fn download(url: &str, output: &str, tzst_bool: bool) -> Result<()> {
     let length = get.content_length().unwrap_or(0);
     let pb = indicatif::ProgressBar::new(length);
     pb.set_style(
-        indicatif::ProgressStyle::with_template(&format!("{}\n[{{elapsed_precise}}] [{{wide_bar:.cyan/blue}}] {{bytes}}/{{total_bytes}}", filename))
+        indicatif::ProgressStyle::with_template(&format!("{}\n[{{elapsed_precise:.cyan/blue}}] [{{wide_bar:.green}}] {{bytes}}/{{total_bytes}}\n\n", filename))
             .unwrap()
             .progress_chars("=> "));
     pb.set_position(0);
@@ -40,7 +40,7 @@ pub async fn download(url: &str, output: &str, tzst_bool: bool) -> Result<()> {
         io::copy(&mut bytes.as_ref(), &mut out)?;
     }
 
-    pb.finish_and_clear();
+    pb.finish();
 
     if tzst_bool {
         if rmext(filename) == filename {
