@@ -1,6 +1,8 @@
 use anyhow::Result;
 use std::fs::File;
 use std::io;
+use indicatif;
+use futures_util::StreamExt;
 
 mod tzst;
 
@@ -15,17 +17,30 @@ pub async fn download(url: &str, output: &str, tzst_bool: bool) -> Result<()> {
     } else {
         output
     };
-    
+
     let client = reqwest::Client::new();
     let get = client.get(url)
         .send()
         .await?;
-    let bytes = get
-        .bytes()
-        .await?;
-    
+
+    let length = get.content_length().unwrap_or(0);
+    let pb = indicatif::ProgressBar::new(length);
+    pb.set_style(
+        indicatif::ProgressStyle::with_template(&format!("{}\n[{{elapsed_precise}}] [{{wide_bar:.cyan/blue}}] {{bytes}}/{{total_bytes}}", filename))
+            .unwrap()
+            .progress_chars("=> "));
+    pb.set_position(0);
+
     let mut out = File::create(filename)?;
-    io::copy(&mut bytes.as_ref(), &mut out)?;
+    let mut stream = get.bytes_stream();
+
+    while let Some(chunk) = stream.next().await {
+        let bytes = chunk?;
+        pb.inc(bytes.len() as u64);
+        io::copy(&mut bytes.as_ref(), &mut out)?;
+    }
+
+    pb.finish_and_clear();
 
     if tzst_bool {
         if rmext(filename) == filename {
