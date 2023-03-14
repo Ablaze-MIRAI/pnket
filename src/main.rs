@@ -3,7 +3,6 @@ use structopt::StructOpt;
 mod download;
 mod text;
 
-
 #[derive(StructOpt)]
 struct Opt {
     url: Vec<String>,
