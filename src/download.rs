@@ -1,8 +1,8 @@
 use anyhow::Result;
+use futures_util::StreamExt;
+use indicatif;
 use std::fs::File;
 use std::io;
-use indicatif;
-use futures_util::StreamExt;
 
 mod tzst;
 
@@ -19,9 +19,7 @@ pub async fn download(url: &str, output: &str, tzst_bool: bool) -> Result<()> {
     };
 
     let client = reqwest::Client::new();
-    let get = client.get(url)
-        .send()
-        .await?;
+    let get = client.get(url).send().await?;
 
     let length = get.content_length().unwrap_or(0);
     let pb = indicatif::ProgressBar::new(length);
