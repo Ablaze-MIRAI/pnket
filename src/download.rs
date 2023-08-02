@@ -6,7 +6,6 @@ use std::io;
 
 mod tzst;
 
-#[tokio::main]
 pub async fn download(url: &str, output: &str, tzst_bool: bool) -> Result<()> {
     let filename: &str = if output.is_empty() {
         if url.ends_with("/") {

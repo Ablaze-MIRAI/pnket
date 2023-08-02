@@ -2,7 +2,6 @@ use anyhow::Result;
 use futures_util::StreamExt;
 use indicatif;
 
-#[tokio::main]
 pub async fn text(url: &str) -> Result<()> {
     let client = reqwest::Client::new();
     let get = client.get(url).send().await?;
