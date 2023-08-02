@@ -21,5 +21,3 @@ Cargo.lock
 # TMP file
 /tmp
 /tmp/
-
-release.sh
